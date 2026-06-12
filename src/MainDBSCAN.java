@@ -125,7 +125,7 @@ public class MainDBSCAN {
             }
 
             // 9. Sauvegarde
-            File outputFile = new File("rendu_zones_biomes.png");
+            File outputFile = new File("imagesBiomes/rendu_zones_biomes.png");
             ImageIO.write(resultImg, "PNG", outputFile);
             System.out.println("Terminé ! " + clusterBiomeColors.size() + " zones (clusters) uniques détectées.");
             System.out.println("Image sauvegardée : " + outputFile.getAbsolutePath());

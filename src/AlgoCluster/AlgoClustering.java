@@ -1,3 +1,5 @@
+package AlgoCluster;
+
 public interface AlgoClustering {
 
     /**

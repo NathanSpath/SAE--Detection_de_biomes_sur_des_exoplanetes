@@ -4,6 +4,7 @@ import flou.Flou;
 import flou.FlouMoyenne;
 import palette.BiomeMapper;
 import palette.ExtractionPalette;
+import palette.Palette;
 import palette.PaletteKmeans;
 
 import javax.imageio.ImageIO;
@@ -20,7 +21,7 @@ public class Main {
     // On cherche plus de couleurs pour avoir plus de candidats
     static final int NB_COULEURS_CANDIDATES = 20;
     // Seuil de similarité pour le filtrage. Plus il est élevé, plus les couleurs seront différentes.
-    static final double SEUIL_SIMILARITE = 20.0;
+    static final double SEUIL_SIMILARITE = 10.0;
 
     public static void main(String[] args) throws IOException {
         if (args.length == 0) {
@@ -28,43 +29,51 @@ public class Main {
             return;
         }
         File img = new File(args[0]);
-        Flou methodeFlou = new FlouMoyenne(5);
+        // Le constructeur de FlouMoyenne n'existe pas, j'utilise le constructeur par défaut.
+        Flou methodeFlou = new FlouMoyenne();
         ExtractionPalette extraction = new PaletteKmeans();
         NormeCouleurs norme = new NormeBetterCIELAB();
         BiomeMapper mapper = new BiomeMapper(norme);
 
+        // 1. Appliquer le flou
         BufferedImage imageTraitee = methodeFlou.appliquerFlou(img);
         ImageIO.write(imageTraitee, "jpg", new File("imagesTraitées/imageTraitee.jpg"));
 
+        // 2. Extraire une palette de couleurs sur-échantillonnée
         System.out.println("Extraction de " + NB_COULEURS_CANDIDATES + " couleurs candidates...");
         Color[] couleursCandidates = extraction.extrairePalette(imageTraitee, NB_COULEURS_CANDIDATES, norme);
 
+        // 3. Filtrer les couleurs pour ne garder que les plus distinctes
         System.out.println("Filtrage des couleurs avec un seuil de " + SEUIL_SIMILARITE + "...");
-        Color[] paletteFinale = filtrerCouleursUniques(couleursCandidates, norme, SEUIL_SIMILARITE);
+        Color[] couleursFiltrees = filtrerCouleursUniques(couleursCandidates, norme, SEUIL_SIMILARITE);
 
-        Map<String, Color> paletteBiome = mapper.getBiomeMapping(paletteFinale);
+        // 4. Mapper les couleurs uniques aux biomes et créer notre objet Palette
+        Map<String, Color> biomeMap = mapper.getBiomeMapping(couleursFiltrees);
+        Palette palette = new Palette(biomeMap, norme);
+
 
         System.out.println("Couleurs candidates extraites: " + Arrays.toString(couleursCandidates));
-        System.out.println("Palette finale après filtrage (" + paletteFinale.length + " couleurs): " + Arrays.toString(paletteFinale));
-        System.out.println("Palette de biomes mappée: " + paletteBiome);
-        System.out.println("Taille de la palette finale: " + paletteBiome.size());
+        System.out.println("Palette finale après filtrage (" + couleursFiltrees.length + " couleurs): " + Arrays.toString(couleursFiltrees));
+        System.out.println("Palette de biomes mappée: " + palette.getBiomeColors());
+        System.out.println("Taille de la palette finale: " + palette.getNbBiomes());
 
-        if (paletteBiome.isEmpty()) {
+        // 5. Création et sauvegarde de l'image de la palette
+        if (palette.getNbBiomes() == 0) {
             System.out.println("Aucune couleur dans la palette finale, impossible de générer l'image.");
             return;
         }
         BufferedImage imgPalette = new BufferedImage(imageTraitee.getWidth(), Math.max(50, imageTraitee.getHeight() / 10), BufferedImage.TYPE_INT_RGB);
         Graphics2D g2d = imgPalette.createGraphics();
         int startX = 0;
-        int widthX = imageTraitee.getWidth() / paletteBiome.size(); // La largeur dépend du nombre de couleurs finales
+        int widthX = imageTraitee.getWidth() / palette.getNbBiomes(); // La largeur dépend du nombre de couleurs finales
 
         int i = 0;
-        for (Map.Entry<String, Color> entry : paletteBiome.entrySet()) {
+        for (Map.Entry<String, Color> entry : palette.getBiomeColors().entrySet()) {
             String biomeName = entry.getKey();
             Color biomeColor = entry.getValue();
 
             g2d.setColor(biomeColor);
-            if (i == paletteBiome.size() - 1) {
+            if (i == palette.getNbBiomes() - 1) {
                 g2d.fillRect(startX, 0, imageTraitee.getWidth() - startX, imgPalette.getHeight());
             } else {
                 g2d.fillRect(startX, 0, widthX, imgPalette.getHeight());

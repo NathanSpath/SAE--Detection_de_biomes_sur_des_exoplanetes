@@ -3,8 +3,13 @@ package palette;
 import Norme.NormeCouleurs;
 
 import java.awt.Color;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class BiomeMapper {
 
@@ -14,7 +19,7 @@ public class BiomeMapper {
     public BiomeMapper(NormeCouleurs norme) {
         this.norme = norme;
         this.biomeReference = new HashMap<>();
-        //initialisation de la palette exmple du sujet pour comparaison avec la notre
+        // Initialisation de la palette de référence
         biomeReference.put(new Color(71, 70, 61), "Tundra");
         biomeReference.put(new Color(43, 50, 35), "Taïga");
         biomeReference.put(new Color(59, 66, 43), "Forêt tempérée");
@@ -27,17 +32,63 @@ public class BiomeMapper {
         biomeReference.put(new Color(12, 31, 47), "Eau profonde");
     }
 
-    public String getBiomeForColor(Color color) {
-        double minDistance = Double.MAX_VALUE;
-        String closestBiome = "Inconnu";
+    private static class Match implements Comparable<Match> {
+        final Color paletteColor;
+        final int paletteIndex;
+        final String biomeName;
+        final double distance;
 
-        for (Map.Entry<Color, String> entry : biomeReference.entrySet()) {
-            double distance = norme.distanceCouleur(color, entry.getKey());
-            if (distance < minDistance) {
-                minDistance = distance;
-                closestBiome = entry.getValue();
+        Match(Color paletteColor, int paletteIndex, String biomeName, double distance) {
+            this.paletteColor = paletteColor;
+            this.paletteIndex = paletteIndex;
+            this.biomeName = biomeName;
+            this.distance = distance;
+        }
+
+        @Override
+        public int compareTo(Match other) {
+            return Double.compare(this.distance, other.distance);
+        }
+    }
+
+    /**
+     * Attribue à chaque couleur de la palette un biome unique en trouvant la meilleure correspondance globale.
+     * @param palette Le tableau de couleurs à mapper.
+     * @return Une carte associant un nom de biome à une couleur à la carte contiendra autant d'entrées que la palette d'entrée.
+     */
+    public Map<String, Color> getBiomeMapping(Color[] palette) {
+        List<Match> allPossibleMatches = new ArrayList<>();
+
+        //créer une liste de tous les appariements possibles entre les couleurs de la palette et les biomes de référence.
+        for (int i = 0; i < palette.length; i++) {
+            for (Map.Entry<Color, String> refEntry : biomeReference.entrySet()) {
+                double dist = norme.distanceCouleur(palette[i], refEntry.getKey());
+                allPossibleMatches.add(new Match(palette[i], i, refEntry.getValue(), dist));
             }
         }
-        return closestBiome;
+
+        //trier la liste
+        Collections.sort(allPossibleMatches);
+
+        Map<String, Color> finalMapping = new HashMap<>();
+        Set<Integer> usedPaletteIndexes = new HashSet<>();
+        Set<String> usedBiomeNames = new HashSet<>();
+
+        //itérer à travers la liste triée de tous les appariements possibles.
+        for (Match match : allPossibleMatches) {
+            // Vérifier si le biome et la couleur de la palette ont déjà été utilisés.
+            if (!usedBiomeNames.contains(match.biomeName) && !usedPaletteIndexes.contains(match.paletteIndex)) {
+                finalMapping.put(match.biomeName, match.paletteColor);
+                usedBiomeNames.add(match.biomeName);
+                usedPaletteIndexes.add(match.paletteIndex);
+            }
+
+            //si toute les couleur on un biome on s'arrete
+            if (finalMapping.size() == palette.length) {
+                break;
+            }
+        }
+
+        return finalMapping;
     }
 }

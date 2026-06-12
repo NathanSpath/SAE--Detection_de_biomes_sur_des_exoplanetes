@@ -11,8 +11,8 @@ public class FlouGausien implements  Flou{
     private final double distribution;
 
     public FlouGausien(int x, int y, double distribution) {
-        this.x = x;
-        this.y = y;
+        this.x = (x % 2 == 0) ? x + 1 : x;
+        this.y = (y % 2 == 0) ? y + 1 : y;
         this.distribution = distribution;
     }
 
@@ -21,7 +21,7 @@ public class FlouGausien implements  Flou{
      * @return la matrice lié au filtre gausien
      */
     private double[][] genererFiltreGausien(){
-        double[][] filtreGausien = new double[this.x][this.y];
+        double[][] filtreGausien = new double[this.y][this.x];
 
         //Initialisation des valeurs
         double somme = 0;
@@ -44,7 +44,7 @@ public class FlouGausien implements  Flou{
         //Normalisation : la somme de tous les coefficients doit être exactement égale à 1
         for(int i=0; i < this.y; i++) {
             for(int j=0; j < this.x; j++) {
-                filtreGausien[j][i] /= somme;
+                filtreGausien[i][j] /= somme;
             }
         }
         return filtreGausien;

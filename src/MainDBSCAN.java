@@ -35,8 +35,8 @@ public class MainDBSCAN {
             int originalHeight = originalImage.getHeight();
 
             // 2. Redimensionnement pour l'analyse - Augmentation pour plus de détails
-            int resizedWidth = 500;
-            int resizedHeight = 500;
+            int resizedWidth = 100;
+            int resizedHeight = 100;
             Image tmp = originalImage.getScaledInstance(resizedWidth, resizedHeight, Image.SCALE_SMOOTH);
             BufferedImage resizedImg = new BufferedImage(resizedWidth, resizedHeight, BufferedImage.TYPE_INT_RGB);
             Graphics2D g2d = resizedImg.createGraphics();

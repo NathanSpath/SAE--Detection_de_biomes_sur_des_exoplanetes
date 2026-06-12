@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
 
 public class PaletteKmeans implements ExtractionPalette {
     public Color[] extrairePalette(BufferedImage image, int nbCouleurs, NormeCouleurs norme) {
@@ -24,25 +25,23 @@ public class PaletteKmeans implements ExtractionPalette {
         g2d.dispose();
 
         Color[] palette = new Color[nbCouleurs];
+        Random rand = new Random();
 
-        //creation de la palette d'origine
+        // Création de la palette d'origine en choisissant des pixels aléatoires dans l'image
         for (int i = 0; i < palette.length; i++) {
-            palette[i] = new Color(
-                    (int) (Math.random() * 255),
-                    (int) (Math.random() * 255),
-                    (int) (Math.random() * 255)
-            );
+            int randomX = rand.nextInt(RESIZED_WIDTH);
+            int randomY = rand.nextInt(RESIZED_HEIGHT);
+            palette[i] = new Color(resizedImage.getRGB(randomX, randomY));
         }
 
         // Boucle de convergence
         for (int iter = 0; iter < MAX_ITERATIONS; iter++) {
-            System.out.println(iter);
             Map<Color, ArrayList<Color>> groupement = new HashMap<>();
             for (Color c : palette) {
                 groupement.put(c, new ArrayList<>());
             }
 
-            //atribution de chaque pixel à la couleur la plus proche
+            // Attribution de chaque pixel à la couleur la plus proche
             for (int y = 0; y < resizedImage.getHeight(); y++) {
                 for (int x = 0; x < resizedImage.getWidth(); x++) {
                     Color pixelColor = new Color(resizedImage.getRGB(x, y));
@@ -55,11 +54,12 @@ public class PaletteKmeans implements ExtractionPalette {
                             distanceMin = distance;
                         }
                     }
-                    groupement.get(nearestColor).add(pixelColor);
+                    // Gérer le cas où le centroïde n'est pas dans la map (peut arriver avec des couleurs identiques)
+                    groupement.computeIfAbsent(nearestColor, k -> new ArrayList<>()).add(pixelColor);
                 }
             }
 
-            // moyenne des groupes pour former la nouvelle palette
+            // Moyenne des groupes pour former la nouvelle palette
             Color[] nouvellePalette = new Color[nbCouleurs];
             for (int i = 0; i < palette.length; i++) {
                 ArrayList<Color> couleursDuGroupe = groupement.get(palette[i]);
@@ -76,15 +76,13 @@ public class PaletteKmeans implements ExtractionPalette {
                             (int) (sommeB / couleursDuGroupe.size())
                     );
                 } else {
-                    nouvellePalette[i] = new Color(
-                            (int) (Math.random() * 255),
-                            (int) (Math.random() * 255),
-                            (int) (Math.random() * 255)
-                    );
+                    int randomX = rand.nextInt(RESIZED_WIDTH);
+                    int randomY = rand.nextInt(RESIZED_HEIGHT);
+                    nouvellePalette[i] = new Color(resizedImage.getRGB(randomX, randomY));
                 }
             }
 
-            // si la palette ne change pas on arrete
+            // Si la palette ne change pas, on arrête
             if (Arrays.equals(palette, nouvellePalette)) {
                 System.out.println("K-Means a convergé après " + (iter + 1) + " itérations.");
                 break;

@@ -30,7 +30,7 @@ public class Main {
         }
         File img = new File(args[0]);
         // Le constructeur de FlouMoyenne n'existe pas, j'utilise le constructeur par défaut.
-        Flou methodeFlou = new FlouMoyenne();
+        Flou methodeFlou = new FlouMoyenne(5);
         ExtractionPalette extraction = new PaletteKmeans();
         NormeCouleurs norme = new NormeBetterCIELAB();
         BiomeMapper mapper = new BiomeMapper(norme);

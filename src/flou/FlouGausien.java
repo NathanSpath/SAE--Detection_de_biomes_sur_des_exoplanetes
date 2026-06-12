@@ -57,7 +57,7 @@ public class FlouGausien implements  Flou{
      * @throws IOException
      */
     @Override
-    public void appliquerFlou(File image) throws IOException {
+    public BufferedImage appliquerFlou(File image) throws IOException {
         System.out.println("Application du flou gausien sur l'image");
 
         BufferedImage img = ImageIO.read(image);

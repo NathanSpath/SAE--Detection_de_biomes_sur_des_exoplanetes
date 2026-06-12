@@ -1,3 +1,5 @@
+package flou;
+
 public interface Flou {
 
     /**

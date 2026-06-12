@@ -12,7 +12,17 @@ import java.util.Map;
 
 public class PaletteKmeans implements ExtractionPalette {
     public Color[] extrairePalette(BufferedImage image, int nbCouleurs, NormeCouleurs norme) {
-        final int MAX_ITERATIONS = 50;
+        final int MAX_ITERATIONS = 100;
+        final int RESIZED_WIDTH = 100;
+        final int RESIZED_HEIGHT = 100;
+
+        // Redimensionner l'image pour l'optimisation
+        Image scaledImage = image.getScaledInstance(RESIZED_WIDTH, RESIZED_HEIGHT, Image.SCALE_SMOOTH);
+        BufferedImage resizedImage = new BufferedImage(RESIZED_WIDTH, RESIZED_HEIGHT, BufferedImage.TYPE_INT_RGB);
+        Graphics2D g2d = resizedImage.createGraphics();
+        g2d.drawImage(scaledImage, 0, 0, null);
+        g2d.dispose();
+
         Color[] palette = new Color[nbCouleurs];
 
         //creation de la palette d'origine
@@ -26,15 +36,16 @@ public class PaletteKmeans implements ExtractionPalette {
 
         // Boucle de convergence
         for (int iter = 0; iter < MAX_ITERATIONS; iter++) {
+            System.out.println(iter);
             Map<Color, ArrayList<Color>> groupement = new HashMap<>();
             for (Color c : palette) {
                 groupement.put(c, new ArrayList<>());
             }
 
             //atribution de chaque pixel à la couleur la plus proche
-            for (int y = 0; y < image.getHeight(); y++) {
-                for (int x = 0; x < image.getWidth(); x++) {
-                    Color pixelColor = new Color(image.getRGB(x, y));
+            for (int y = 0; y < resizedImage.getHeight(); y++) {
+                for (int x = 0; x < resizedImage.getWidth(); x++) {
+                    Color pixelColor = new Color(resizedImage.getRGB(x, y));
                     double distanceMin = Double.MAX_VALUE;
                     Color nearestColor = palette[0];
                     for (Color centroid : palette) {

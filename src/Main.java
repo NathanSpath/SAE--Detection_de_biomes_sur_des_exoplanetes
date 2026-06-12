@@ -1,7 +1,9 @@
 import Norme.NormeBetterCIELAB;
 import Norme.NormeCouleurs;
+import Norme.NormeRedmean;
 import flou.Flou;
-import flou.FlouMoyenne;
+import flou.*;
+import palette.BiomeMapper;
 import palette.ExtractionPalette;
 import palette.Palette;
 import palette.PaletteKmeans;
@@ -11,15 +13,18 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
 
 public class Main {
     static final int NB_COULEUR_PALETTE =  10;
 
     public static void main(String[] args) throws IOException {
         File img = new File(args[0]);
-        Flou methodeFlou = new FlouMoyenne();
+        Flou methodeFlou = new FlouMoyenne(5);
         ExtractionPalette extraction =  new PaletteKmeans();
         NormeCouleurs norme = new NormeBetterCIELAB();
+        BiomeMapper mapper = new BiomeMapper(new NormeBetterCIELAB());
+        HashMap<String,Color> paletteBiome = new  HashMap();
 
         //teste du flou
         BufferedImage imageTraitee = methodeFlou.appliquerFlou(img);
@@ -27,7 +32,11 @@ public class Main {
 
         //test de la creation de palette
         Color[] couleursExtraites = extraction.extrairePalette(imageTraitee, NB_COULEUR_PALETTE, norme);
+        for (int i = 0; i < couleursExtraites.length; i++) {
+            paletteBiome.put(mapper.getBiomeForColor(couleursExtraites[i]), couleursExtraites[i]);
+        }
         Palette palette = new Palette(couleursExtraites, norme);
+        System.out.println(paletteBiome);
 
         // Création et sauvegarde de l'image de la palette
         BufferedImage imgPalette = new BufferedImage(imageTraitee.getWidth(), Math.max(50, imageTraitee.getHeight() / 10), BufferedImage.TYPE_INT_RGB);

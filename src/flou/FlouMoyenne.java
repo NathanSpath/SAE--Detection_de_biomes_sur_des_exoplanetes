@@ -9,7 +9,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class FlouMoyenne implements Flou{
-    final int TAILLE_FILTRE = 5;
+    int TAILLE_FILTRE;
+    public FlouMoyenne(int taille){
+        this.TAILLE_FILTRE = taille;
+    }
     @Override
     public BufferedImage appliquerFlou(File imgFile) throws IOException {
         //cree l'image a partir du fichier

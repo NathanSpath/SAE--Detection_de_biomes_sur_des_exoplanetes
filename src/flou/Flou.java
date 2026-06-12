@@ -5,9 +5,7 @@ public interface Flou {
 
     /**
      * Interface de methode de flou
-     * @param x
-     * @param y
-     * @param distribution écart type gausien
+     * @param image image à flouter
      */
-    public void appliquerFlou(int x, int y, double distribution, Image image);
+    public void appliquerFlou(Image image);
 }

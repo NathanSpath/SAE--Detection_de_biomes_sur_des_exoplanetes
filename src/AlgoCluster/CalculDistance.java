@@ -1,4 +1,4 @@
-package AlgorithmeHAC;
+package AlgoCluster;
 public class CalculDistance {
     public double distancePoint(Point p1, Point p2) {
         // Calcule de la distance euclidienne

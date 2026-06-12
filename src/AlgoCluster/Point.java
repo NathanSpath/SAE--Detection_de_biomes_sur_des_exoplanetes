@@ -1,4 +1,4 @@
-package AlgorithmeHAC;
+package AlgoCluster;
 
 public class Point {
     int x;

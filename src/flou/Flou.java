@@ -1,4 +1,5 @@
 package flou;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 
@@ -8,5 +9,5 @@ public interface Flou {
      * Interface de methode de flou
      * @param image image à flouter
      */
-    public void appliquerFlou(File image) throws IOException;
+    public BufferedImage appliquerFlou(File image) throws IOException;
 }

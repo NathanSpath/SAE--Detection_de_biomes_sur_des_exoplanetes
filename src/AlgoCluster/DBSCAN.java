@@ -15,11 +15,10 @@ public class DBSCAN implements AlgoClustering {
 
     @Override
     public int[] cluster(double[][] X) {
-
-        return new int[X.length]; // Placeholder, à remplacer par l'implémentation réelle
+        return algoDBSCAN(X, eps, minPts);
     }
 
-    public int[] DBSCAN(double[][] X, double eps, int minPts) {
+    public int[] algoDBSCAN(double[][] X, double eps, int minPts) {
         int[] labels = new int[X.length];
         boolean[] visited = new boolean[X.length];
         int C = 0;

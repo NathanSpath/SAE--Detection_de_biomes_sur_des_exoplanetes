@@ -1,18 +1,13 @@
 package flou;
+import java.awt.*;
 
 public interface Flou {
 
     /**
-     * Méthode pour le flou moyen
-     * @param r
-     */
-    public void flouMoyenne(int r);
-
-    /**
-     * Méthode pour le flou Gausien
+     * Interface de methode de flou
      * @param x
      * @param y
      * @param distribution écart type gausien
      */
-    public void flouGausien(int x, int y,double distribution);
+    public void appliquerFlou(int x, int y, double distribution, Image image);
 }

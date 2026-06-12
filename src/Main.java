@@ -21,7 +21,7 @@ public class Main {
     public static void main(String[] args) throws IOException {
         File img = new File(args[0]);
         //Flou methodeFlou = new FlouMoyenne(5);
-        Flou methodeFlou = new FlouGausien(7,7,(double) 1/273);
+        Flou methodeFlou = new FlouGausien(7,7,2.0);
         ExtractionPalette extraction =  new PaletteKmeans();
         NormeCouleurs norme = new NormeBetterCIELAB();
         BiomeMapper mapper = new BiomeMapper(new NormeBetterCIELAB());

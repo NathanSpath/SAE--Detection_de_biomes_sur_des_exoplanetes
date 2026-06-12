@@ -23,13 +23,14 @@ public class FlouGausien implements  Flou{
         double somme = 0;
         int rayonX = this.x / 2;
         int rayonY = this.y / 2;
-        double pi2sigmaCarre
+        double pi2sigmaCarre;
 
+        return filtreGausien;
     }
 
 
     @Override
-    public void appliquerFlou(File image) throws IOException {
+    public BufferedImage appliquerFlou(File image) throws IOException {
         System.out.println("Application du flou gausien sur l'image");
 
         BufferedImage img = ImageIO.read(image);
@@ -41,5 +42,6 @@ public class FlouGausien implements  Flou{
 
             }
         }
+        return img;
     }
 }

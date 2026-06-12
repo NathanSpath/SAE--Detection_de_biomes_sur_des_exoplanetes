@@ -1,4 +1,4 @@
-package AlgorithmeHAC;
+package AlgoCluster;
 
 import java.util.ArrayList;
 

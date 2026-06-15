@@ -12,6 +12,7 @@ import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -86,8 +87,35 @@ public class MainDBSCAN {
             }
 
             // 6. Sauvegarde
+            //File biomeMapFile = new File("carte_biomes.png");
+            //ImageIO.write(biomeMap, "PNG", biomeMapFile);
+
+            // 6. Sauvegarde de la carte complète
             File biomeMapFile = new File("carte_biomes.png");
             ImageIO.write(biomeMap, "PNG", biomeMapFile);
+
+            // ==========================================
+            // 7. Visualisation de Biome Individuel (Bonus)
+            // ==========================================
+            System.out.println("Génération du calque pour un biome spécifique...");
+
+            // On vérifie qu'on a bien trouvé des biomes
+            if (!paletteBiome.isEmpty()) {
+                // Pour l'exemple, on prend le tout premier biome de ta HashMap
+                Map.Entry<String, Color> biomeCible = paletteBiome.entrySet().iterator().next();
+                String nomBiome = biomeCible.getKey();
+                Color couleurBiome = biomeCible.getValue();
+
+                System.out.println("Isolement en cours pour le biome : " + nomBiome);
+
+                // On nettoie le nom du fichier au cas où il y aurait des espaces
+                String nomFichierPropre = nomBiome.replaceAll("\\s+", "_");
+                String fichierSortie = "masque_biome_" + nomFichierPropre + ".png";
+
+                // On appelle notre nouvelle méthode
+                genererMasqueBiome(originalImage, biomeMap, couleurBiome, fichierSortie);
+                System.out.println("Calque généré avec succès : " + fichierSortie);
+            }
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -125,5 +153,39 @@ public class MainDBSCAN {
             }
         }
         return couleursUniques.toArray(new Color[0]);
+    }
+
+    /**
+     * Génère une image isolant un biome spécifique.
+     * Les pixels n'appartenant pas au biome deviennent transparents.
+     */
+    private static void genererMasqueBiome(BufferedImage imageOriginale, BufferedImage carteBiomes, Color couleurBiomeCible, String nomFichierSortie) throws IOException {
+        int width = imageOriginale.getWidth();
+        int height = imageOriginale.getHeight();
+
+        // On utilise ARGB pour gérer le canal Alpha (la transparence)
+        BufferedImage masqueImg = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+
+        // Couleur transparente (Noir avec 0 d'opacité)
+        int couleurTransparente = new Color(0, 0, 0, 0).getRGB();
+        int cibleRGB = couleurBiomeCible.getRGB();
+
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                // On regarde à quel biome appartient ce pixel sur la carte générée
+                int pixelBiomeCourant = carteBiomes.getRGB(x, y);
+
+                if (pixelBiomeCourant == cibleRGB) {
+                    // Si c'est le bon biome, on affiche le pixel de l'image source (ou floutée)
+                    masqueImg.setRGB(x, y, imageOriginale.getRGB(x, y));
+                } else {
+                    // Sinon, on rend le pixel invisible
+                    masqueImg.setRGB(x, y, couleurTransparente);
+                }
+            }
+        }
+
+        // Sauvegarde de l'image isolée
+        ImageIO.write(masqueImg, "PNG", new File(nomFichierSortie));
     }
 }

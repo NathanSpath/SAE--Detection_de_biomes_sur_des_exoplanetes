@@ -19,8 +19,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.*;
+import java.util.logging.*;
 
 public class MainNouveau {
+
+    private static final Logger logger = Logger.getLogger(MainNouveau.class.getName());
 
     // --- PARAMÈTRES OPTIMISÉS ET ÉQUILIBRÉS ---
     static final int NB_THREADS = Runtime.getRuntime().availableProcessors();
@@ -39,14 +42,38 @@ public class MainNouveau {
     static final int DBSCAN_MIN_PTS = 10;     // minPts=10 est un bon compromis pour trouver des clusters sans être trop lent.
 
 
-    public static void main(String[] args) throws IOException, InterruptedException, ExecutionException {
-        System.out.println("--- Démarrage du pipeline avec paramètres optimisés ---");
-        System.out.println("Utilisation de " + NB_THREADS + " threads.");
+    public static void main(String[] args) {
+        try {
+            setupLogger();
+            logger.info("--- Démarrage du pipeline avec paramètres optimisés ---");
+            logger.info("Utilisation de " + NB_THREADS + " threads.");
 
+            runPipeline();
+
+            logger.info("\n--- Pipeline de visualisation terminé. Résultats dans le dossier '" + OUTPUT_DIR + "' ---");
+        } catch (Exception e) {
+            logger.log(Level.SEVERE, "Une erreur critique est survenue dans le pipeline.", e);
+        }
+    }
+
+    private static void setupLogger() throws IOException {
+        logger.setUseParentHandlers(false);
+        Handler consoleHandler = new ConsoleHandler();
+        consoleHandler.setFormatter(new SimpleFormatter());
+        logger.addHandler(consoleHandler);
+
+        FileHandler fileHandler = new FileHandler("main_nouveau.log");
+        fileHandler.setFormatter(new SimpleFormatter());
+        logger.addHandler(fileHandler);
+
+        logger.setLevel(Level.INFO);
+    }
+
+    private static void runPipeline() throws IOException, InterruptedException, ExecutionException {
         // --- 1. ÉTAPES GLOBALES (THREAD PRINCIPAL) ---
         File inputFile = new File(IMAGE_INPUT_PATH);
         if (!inputFile.exists()) {
-            System.out.println("Erreur : Fichier d'entrée introuvable.");
+            logger.severe("Erreur : Fichier d'entrée introuvable.");
             return;
         }
         BufferedImage originalImage = ImageIO.read(inputFile);
@@ -58,22 +85,22 @@ public class MainNouveau {
 
         Flou flou = new FlouMoyenne(FLOU_RAYON);
         BufferedImage blurredImg = flou.appliquerFlou(inputFile);
-        System.out.println("Image pré-traitée avec un filtre de flou (rayon=" + FLOU_RAYON + ").");
+        logger.info("Image pré-traitée avec un filtre de flou (rayon=" + FLOU_RAYON + ").");
 
         NormeCouleurs norme = new NormeBetterCIELAB();
         AlgoExtractionPalette kmeans = new PaletteKmeans(KMEANS_K);
         Color[] paletteCouleurs = kmeans.extrairePalette(blurredImg, KMEANS_K, norme);
         Palette paletteBiomes = new Palette(new BiomeMapper(norme).getBiomeMapping(paletteCouleurs), norme);
-        System.out.println("Palette de biomes globale créée (k=" + KMEANS_K + ").");
+        logger.info("Palette de biomes globale créée (k=" + KMEANS_K + ").");
 
         // --- 2. PARALLÉLISATION DE LA CARTOGRAPHIE DES BIOMES ---
-        System.out.println("Cartographie des biomes en parallèle...");
+        logger.info("Cartographie des biomes en parallèle...");
         ExecutorService executor = Executors.newFixedThreadPool(NB_THREADS);
         Map<String, List<Point>> pixelsParBiome = mapBiomesParallel(blurredImg, paletteBiomes, executor);
-        System.out.println("Cartographie des biomes terminée.");
+        logger.info("Cartographie des biomes terminée.");
 
         // --- 3. PARALLÉLISATION DE L'ANALYSE ET DE LA VISUALISATION ---
-        System.out.println("\nGénération des images de biomes et écosystèmes en parallèle...");
+        logger.info("\nGénération des images de biomes et écosystèmes en parallèle...");
         BufferedImage lightBackground = createLightBackground(originalImage, 0.75f);
         List<Callable<Void>> visualizationTasks = new ArrayList<>();
 
@@ -91,7 +118,6 @@ public class MainNouveau {
 
         executor.invokeAll(visualizationTasks);
         executor.shutdown();
-        System.out.println("\n--- Pipeline de visualisation terminé. Résultats dans le dossier '" + OUTPUT_DIR + "' ---");
     }
 
     private static Map<String, List<Point>> mapBiomesParallel(BufferedImage blurredImg, Palette palette, ExecutorService executor) throws InterruptedException, ExecutionException {
@@ -143,16 +169,16 @@ public class MainNouveau {
         g2d.dispose();
         String biomeFileName = String.format("%s/%s_biomes/%s_biome_%s.png", OUTPUT_DIR, imageName, imageName, biomeName);
         ImageIO.write(biomeImage, "PNG", new File(biomeFileName));
-        System.out.println(" -> Image de biome sauvegardée : " + biomeFileName);
+        logger.info(" -> Image de biome sauvegardée : " + biomeFileName);
     }
 
     private static void visualizeEcosystemsForBiome(String imageName, String biomeName, List<Point> biomePixels, BufferedImage lightBackground) throws IOException {
         if (biomePixels.size() < DBSCAN_MIN_PTS) {
-            System.out.println(" -> Biome '" + biomeName + "' ignoré pour les écosystèmes (pas assez de pixels).");
+            logger.info(" -> Biome '" + biomeName + "' ignoré pour les écosystèmes (pas assez de pixels).");
             return;
         }
 
-        System.out.println("Traitement des écosystèmes pour le biome : " + biomeName);
+        logger.info("Traitement des écosystèmes pour le biome : " + biomeName);
         DBSCAN dbscan = new DBSCAN(DBSCAN_EPS, DBSCAN_MIN_PTS);
         double[][] points = new double[biomePixels.size()][2];
         for (int i = 0; i < biomePixels.size(); i++) {
@@ -169,7 +195,7 @@ public class MainNouveau {
         }
         
         if (pixelsParEcosysteme.isEmpty()) {
-            System.out.println(" -> Aucun écosystème trouvé pour le biome '" + biomeName + "' avec les paramètres actuels.");
+            logger.warning(" -> Aucun écosystème trouvé pour le biome '" + biomeName + "' avec les paramètres actuels.");
             return;
         }
 
@@ -188,7 +214,7 @@ public class MainNouveau {
 
         String ecosystemFileName = String.format("%s/%s_ecosystemes_par_biome/%s_ecosystemes_%s.png", OUTPUT_DIR, imageName, imageName, biomeName);
         ImageIO.write(ecosystemImage, "PNG", new File(ecosystemFileName));
-        System.out.println(" -> Carte des écosystèmes pour '" + biomeName + "' sauvegardée. (" + pixelsParEcosysteme.size() + " écosystèmes)");
+        logger.info(" -> Carte des écosystèmes pour '" + biomeName + "' sauvegardée. (" + pixelsParEcosysteme.size() + " écosystèmes)");
     }
 
     private static BufferedImage createLightBackground(BufferedImage original, float percentage) {

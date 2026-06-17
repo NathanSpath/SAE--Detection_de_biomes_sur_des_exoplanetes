@@ -47,12 +47,12 @@ public class BiomeMapper {
 
         // Biomes montagneux et froids
         biomeReference.put(new Color(140, 130, 120), "Toundra_Roche");
-        biomeReference.put(new Color(140, 145, 120), "Toundra_Herbeuse"); // More greenish/earthy
+        biomeReference.put(new Color(140, 145, 120), "Toundra_Herbeuse");
         biomeReference.put(new Color(90, 90, 95),    "Montagne_Basse");
         biomeReference.put(new Color(70, 70, 80),    "Haute_Montagne");
         biomeReference.put(new Color(200, 195, 190), "Pics_Rocheux");
-        biomeReference.put(new Color(250, 250, 255), "Neige_Permanente"); // Almost pure white
-        biomeReference.put(new Color(210, 225, 235), "Glacier"); // More bluish and distinct from snow
+        biomeReference.put(new Color(250, 250, 255), "Neige_Permanente");
+        biomeReference.put(new Color(210, 225, 235), "Glacier");
 
         // Biomes spéciaux
         biomeReference.put(new Color(110, 130, 110), "Marais");

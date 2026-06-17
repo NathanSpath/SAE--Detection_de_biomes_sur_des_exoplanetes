@@ -28,10 +28,9 @@ public class Main {
 
     public static class Config {
         public static final int NB_THREADS = Runtime.getRuntime().availableProcessors();
-        public static final String IMAGE_INPUT_PATH = "Images/Planete_1.jpg";
+        public static final String IMAGE_INPUT_PATH = "Images/Planete_5.jpeg";
         public static final String OUTPUT_DIR = "resultats_analyse";
 
-        // Augmentation de K pour casser les grands biomes
         public static final int KMEANS_NB_COULEURS = 40;
         public static final double SEUIL_SIMILARITE_COULEUR = 15.0;
         public static final int FLOU_GAUSSIEN_KERNEL_SIZE = 5;
@@ -47,7 +46,6 @@ public class Main {
         public static final double DBSCAN_EPS_RAPIDE = 4.0;
         public static final int DBSCAN_MIN_PTS_RAPIDE = 3;
 
-        // Paramètres agressivement réduits pour le mode très rapide
         public static final int MAX_PIXELS_TRES_RAPIDE = 150_000;
         public static final int GRILLE_MODE_TRES_RAPIDE_TAILLE = 600;
         public static final double DBSCAN_EPS_TRES_RAPIDE = 4.0;
@@ -95,7 +93,7 @@ public class Main {
         NormeCouleurs norme = new NormeBetterCIELAB();
         AlgoExtractionPalette kmeans = new PaletteKmeans(Config.KMEANS_NB_COULEURS);
         Color[] couleursCandidates = kmeans.extrairePalette(blurredImg, Config.KMEANS_NB_COULEURS, norme);
-        Color[] couleursFiltrees = filtrerCouleursUniques(couleursCandidates, norme, Config.SEUIL_SIMILARITE_COULEUR);
+        Color[] couleursFiltrees = filtrerCouleursUniques(couleursCandidates, norme);
         Palette paletteBiomes = new Palette(new BiomeMapper(norme).getBiomeMapping(couleursFiltrees), norme);
         logger.info("Étape 2: Palette de " + paletteBiomes.getNbBiomes() + " biomes créée.");
 
@@ -104,7 +102,7 @@ public class Main {
         logger.info("Étape 3: Cartographie des biomes terminée.");
 
         logger.info("\nÉtape 4: Génération des images...");
-        BufferedImage lightBackground = createLightBackground(originalImage, 0.75f);
+        BufferedImage lightBackground = createLightBackground(originalImage);
         List<Callable<Void>> visualizationTasks = new ArrayList<>();
         for (Map.Entry<String, List<Point>> entry : pixelsParBiome.entrySet()) {
             String biomeName = entry.getKey();
@@ -134,7 +132,7 @@ public class Main {
             pixelsParEcosysteme = clusterNormalMode(biomePixels);
         }
 
-        if (pixelsParEcosysteme == null || pixelsParEcosysteme.isEmpty()) {
+        if (pixelsParEcosysteme.isEmpty()) {
             logger.warning("Aucun écosystème pour '" + biomeName + "'.");
             return;
         }
@@ -186,7 +184,7 @@ public class Main {
         List<Integer> gridIndices = new ArrayList<>();
         for (int i = 0; i < cellPixels.length; i++) {
             if (cellPixels[i] != null) {
-                gridPoints.add(new double[]{i % gridW, i / gridW});
+                gridPoints.add(new double[]{i % gridW, (double) i / gridW});
                 gridIndices.add(i);
             }
         }
@@ -208,10 +206,10 @@ public class Main {
         return clusterGridMode(sampledPixels, imgWidth, imgHeight, Config.GRILLE_MODE_TRES_RAPIDE_TAILLE, Config.DBSCAN_EPS_TRES_RAPIDE, Config.DBSCAN_MIN_PTS_TRES_RAPIDE);
     }
 
-    private static Color[] filtrerCouleursUniques(Color[] couleurs, NormeCouleurs norme, double seuil) {
+    private static Color[] filtrerCouleursUniques(Color[] couleurs, NormeCouleurs norme) {
         List<Color> uniques = new ArrayList<>();
         for (Color c : couleurs) {
-            if (uniques.stream().noneMatch(u -> norme.distanceCouleur(c, u) < seuil)) uniques.add(c);
+            if (uniques.stream().noneMatch(u -> norme.distanceCouleur(c, u) < Config.SEUIL_SIMILARITE_COULEUR)) uniques.add(c);
         }
         return uniques.toArray(new Color[0]);
     }
@@ -250,14 +248,14 @@ public class Main {
         return finalMap;
     }
 
-    private static BufferedImage createLightBackground(BufferedImage original, float percentage) {
+    private static BufferedImage createLightBackground(BufferedImage original) {
         BufferedImage lightImage = new BufferedImage(original.getWidth(), original.getHeight(), BufferedImage.TYPE_INT_RGB);
         for (int y = 0; y < original.getHeight(); y++) {
             for (int x = 0; x < original.getWidth(); x++) {
                 Color c = new Color(original.getRGB(x, y));
-                int r = (int) (c.getRed() + (255 - c.getRed()) * percentage);
-                int g = (int) (c.getGreen() + (255 - c.getGreen()) * percentage);
-                int b = (int) (c.getBlue() + (255 - c.getBlue()) * percentage);
+                int r = (int) (c.getRed() + (255 - c.getRed()) * (float) 0.75);
+                int g = (int) (c.getGreen() + (255 - c.getGreen()) * (float) 0.75);
+                int b = (int) (c.getBlue() + (255 - c.getBlue()) * (float) 0.75);
                 lightImage.setRGB(x, y, new Color(r, g, b).getRGB());
             }
         }

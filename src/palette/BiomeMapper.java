@@ -19,17 +19,44 @@ public class BiomeMapper {
     public BiomeMapper(NormeCouleurs norme) {
         this.norme = norme;
         this.biomeReference = new HashMap<>();
-        // Initialisation de la palette de référence
-        biomeReference.put(new Color(71, 70, 61), "Tundra");
-        biomeReference.put(new Color(43, 50, 35), "Taïga");
-        biomeReference.put(new Color(59, 66, 43), "Forêt tempérée");
-        biomeReference.put(new Color(46, 64, 34), "Forêt tropicale");
-        biomeReference.put(new Color(84, 106, 70), "Savane");
-        biomeReference.put(new Color(104, 95, 82), "Prairie");
-        biomeReference.put(new Color(152, 140, 120), "Désert");
-        biomeReference.put(new Color(200, 200, 200), "Glacier");
-        biomeReference.put(new Color(49, 83, 100), "Eau peu profonde");
-        biomeReference.put(new Color(12, 31, 47), "Eau profonde");
+
+        // Biomes aquatiques
+        biomeReference.put(new Color(15, 23, 42),    "Ocean_Profond");
+        biomeReference.put(new Color(30, 60, 110),   "Ocean");
+        biomeReference.put(new Color(60, 120, 160),  "Mer_Peu_Profonde");
+        biomeReference.put(new Color(100, 160, 200), "Lac");
+        biomeReference.put(new Color(130, 190, 220), "Rivière");
+
+        // Biomes côtiers et arides
+        biomeReference.put(new Color(210, 200, 140), "Plage_Sable");
+        biomeReference.put(new Color(230, 220, 170), "Dunes_Sable");
+        biomeReference.put(new Color(190, 180, 110), "Desert_Sable");
+        biomeReference.put(new Color(160, 140, 90),  "Desert_Rocheux");
+        biomeReference.put(new Color(200, 160, 120), "Badlands");
+
+        // Biomes de végétation
+        biomeReference.put(new Color(120, 150, 70),  "Plaine_Herbeuse");
+        biomeReference.put(new Color(150, 170, 90),  "Prairie");
+        biomeReference.put(new Color(100, 130, 60),  "Steppe");
+        biomeReference.put(new Color(60, 110, 50),   "Foret_Temperee");
+        biomeReference.put(new Color(30, 70, 40),    "Foret_Boreale_Dense");
+        biomeReference.put(new Color(40, 90, 60),    "Foret_Tropicale");
+        biomeReference.put(new Color(80, 120, 40),   "Jungle");
+        biomeReference.put(new Color(100, 100, 40),  "Savane");
+        biomeReference.put(new Color(140, 130, 80),  "Brousse");
+
+        // Biomes montagneux et froids
+        biomeReference.put(new Color(140, 130, 120), "Toundra_Roche");
+        biomeReference.put(new Color(140, 145, 120), "Toundra_Herbeuse"); // More greenish/earthy
+        biomeReference.put(new Color(90, 90, 95),    "Montagne_Basse");
+        biomeReference.put(new Color(70, 70, 80),    "Haute_Montagne");
+        biomeReference.put(new Color(200, 195, 190), "Pics_Rocheux");
+        biomeReference.put(new Color(250, 250, 255), "Neige_Permanente"); // Almost pure white
+        biomeReference.put(new Color(210, 225, 235), "Glacier"); // More bluish and distinct from snow
+
+        // Biomes spéciaux
+        biomeReference.put(new Color(110, 130, 110), "Marais");
+        biomeReference.put(new Color(80, 60, 50),    "Terre_Volcanique");
     }
 
     private static class Match implements Comparable<Match> {
@@ -54,12 +81,22 @@ public class BiomeMapper {
     /**
      * Attribue à chaque couleur de la palette un biome unique en trouvant la meilleure correspondance globale.
      * @param palette Le tableau de couleurs à mapper.
-     * @return Une carte associant un nom de biome à une couleur à la carte contiendra autant d'entrées que la palette d'entrée.
+     * @return Une carte associant un nom de biome à une couleur.
      */
     public Map<String, Color> getBiomeMapping(Color[] palette) {
+        return getBiomeMapping(palette, palette.length);
+    }
+
+    /**
+     * Sélectionne les 'n' biomes les plus représentatifs pour la palette de couleurs donnée.
+     * @param palette Le tableau de couleurs à mapper.
+     * @param n Le nombre de biomes à sélectionner.
+     * @return Une carte associant un nom de biome à une couleur.
+     */
+    public Map<String, Color> getBiomeMapping(Color[] palette, int n) {
         List<Match> allPossibleMatches = new ArrayList<>();
 
-        //créer une liste de tous les appariements possibles entre les couleurs de la palette et les biomes de référence.
+        // Créer une liste de tous les appariements possibles
         for (int i = 0; i < palette.length; i++) {
             for (Map.Entry<Color, String> refEntry : biomeReference.entrySet()) {
                 double dist = norme.distanceCouleur(palette[i], refEntry.getKey());
@@ -67,25 +104,22 @@ public class BiomeMapper {
             }
         }
 
-        //trier la liste
+        // Trier les appariements du plus proche au plus lointain
         Collections.sort(allPossibleMatches);
 
         Map<String, Color> finalMapping = new HashMap<>();
         Set<Integer> usedPaletteIndexes = new HashSet<>();
         Set<String> usedBiomeNames = new HashSet<>();
 
-        //itérer à travers la liste triée de tous les appariements possibles.
+        // Itérer pour trouver la meilleure attribution un-à-un
         for (Match match : allPossibleMatches) {
-            // Vérifier si le biome et la couleur de la palette ont déjà été utilisés.
+            if (finalMapping.size() >= n) {
+                break; // Arrêter une fois que 'n' biomes ont été trouvés
+            }
             if (!usedBiomeNames.contains(match.biomeName) && !usedPaletteIndexes.contains(match.paletteIndex)) {
                 finalMapping.put(match.biomeName, match.paletteColor);
                 usedBiomeNames.add(match.biomeName);
                 usedPaletteIndexes.add(match.paletteIndex);
-            }
-
-            //si toute les couleur on un biome on s'arrete
-            if (finalMapping.size() == palette.length) {
-                break;
             }
         }
 

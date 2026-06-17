@@ -13,6 +13,20 @@ public class DBSCAN implements AlgoClustering {
         this.minPts = minPts;
     }
 
+    // Getters pour l'accès aux paramètres
+    public double getEps() {
+        return eps;
+    }
+
+    public int getMinPts() {
+        return minPts;
+    }
+
+    @Override
+    public String toString() {
+        return "DBSCAN (eps=" + eps + ", minPts=" + minPts + ")";
+    }
+
     @Override
     public int[] cluster(double[][] X) {
         return algoDBSCAN(X, eps, minPts);

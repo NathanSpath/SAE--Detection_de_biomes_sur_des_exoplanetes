@@ -60,4 +60,8 @@ public class Palette {
     public int getNbBiomes() {
         return biomeColors.size();
     }
+
+    public Color getBiomeColor(String biomeName) {
+        return biomeColors.get(biomeName);
+    }
 }

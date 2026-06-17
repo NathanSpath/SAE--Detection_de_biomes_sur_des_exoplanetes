@@ -1,9 +1,9 @@
 package palette;
 
-
 import Norme.NormeCouleurs;
-
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Graphics2D;
+import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -11,8 +11,27 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 
-public class PaletteKmeans implements ExtractionPalette {
+// Mise à jour pour implémenter la nouvelle interface standardisée
+public class PaletteKmeans implements AlgoExtractionPalette {
+
+    private final int k; // Nombre de clusters (nbCouleurs)
+
+    public PaletteKmeans(int k) {
+        this.k = k;
+    }
+
+    // Getter pour l'accès au paramètre
+    public int getK() {
+        return k;
+    }
+
+    @Override
     public Color[] extrairePalette(BufferedImage image, int nbCouleurs, NormeCouleurs norme) {
+        // Le nombre de couleurs est maintenant défini par le constructeur
+        if (nbCouleurs != 0 && nbCouleurs != this.k) {
+            System.out.println("Avertissement : Le nombre de couleurs demandé (" + nbCouleurs + ") est différent de celui configuré (" + this.k + "). Utilisation de k=" + this.k);
+        }
+
         final int MAX_ITERATIONS = 100;
         final int RESIZED_WIDTH = 100;
         final int RESIZED_HEIGHT = 100;
@@ -24,44 +43,44 @@ public class PaletteKmeans implements ExtractionPalette {
         g2d.drawImage(scaledImage, 0, 0, null);
         g2d.dispose();
 
-        Color[] palette = new Color[nbCouleurs];
+        Color[] palette = new Color[this.k];
         Random rand = new Random();
 
-        // Création de la palette d'origine en choisissant des pixels aléatoires dans l'image
-        for (int i = 0; i < palette.length; i++) {
+        // Initialisation des centroïdes avec des pixels aléatoires
+        for (int i = 0; i < this.k; i++) {
             int randomX = rand.nextInt(RESIZED_WIDTH);
             int randomY = rand.nextInt(RESIZED_HEIGHT);
             palette[i] = new Color(resizedImage.getRGB(randomX, randomY));
         }
 
-        // Boucle de convergence
         for (int iter = 0; iter < MAX_ITERATIONS; iter++) {
             Map<Color, ArrayList<Color>> groupement = new HashMap<>();
             for (Color c : palette) {
                 groupement.put(c, new ArrayList<>());
             }
 
-            // Attribution de chaque pixel à la couleur la plus proche
-            for (int y = 0; y < resizedImage.getHeight(); y++) {
-                for (int x = 0; x < resizedImage.getWidth(); x++) {
+            // Attribution de chaque pixel au centroïde le plus proche
+            for (int y = 0; y < RESIZED_HEIGHT; y++) {
+                for (int x = 0; x < RESIZED_WIDTH; x++) {
                     Color pixelColor = new Color(resizedImage.getRGB(x, y));
                     double distanceMin = Double.MAX_VALUE;
-                    Color nearestColor = palette[0];
+                    Color nearestCentroid = palette[0];
                     for (Color centroid : palette) {
                         double distance = norme.distanceCouleur(pixelColor, centroid);
                         if (distance < distanceMin) {
-                            nearestColor = centroid;
+                            nearestCentroid = centroid;
                             distanceMin = distance;
                         }
                     }
-                    // Gérer le cas où le centroïde n'est pas dans la map (peut arriver avec des couleurs identiques)
-                    groupement.computeIfAbsent(nearestColor, k -> new ArrayList<>()).add(pixelColor);
+                    groupement.computeIfAbsent(nearestCentroid, key -> new ArrayList<>()).add(pixelColor);
                 }
             }
 
-            // Moyenne des groupes pour former la nouvelle palette
-            Color[] nouvellePalette = new Color[nbCouleurs];
-            for (int i = 0; i < palette.length; i++) {
+            Color[] nouvellePalette = new Color[this.k];
+            boolean hasChanged = false;
+
+            // Recalcul des centroïdes
+            for (int i = 0; i < this.k; i++) {
                 ArrayList<Color> couleursDuGroupe = groupement.get(palette[i]);
                 if (couleursDuGroupe != null && !couleursDuGroupe.isEmpty()) {
                     long sommeR = 0, sommeG = 0, sommeB = 0;
@@ -76,18 +95,20 @@ public class PaletteKmeans implements ExtractionPalette {
                             (int) (sommeB / couleursDuGroupe.size())
                     );
                 } else {
+                    // Si un centroïde n'a aucun point, on le réinitialise aléatoirement
                     int randomX = rand.nextInt(RESIZED_WIDTH);
                     int randomY = rand.nextInt(RESIZED_HEIGHT);
                     nouvellePalette[i] = new Color(resizedImage.getRGB(randomX, randomY));
                 }
+                if (!palette[i].equals(nouvellePalette[i])) {
+                    hasChanged = true;
+                }
             }
 
-            // Si la palette ne change pas, on arrête
-            if (Arrays.equals(palette, nouvellePalette)) {
-                System.out.println("K-Means a convergé après " + (iter + 1) + " itérations.");
+            if (!hasChanged) {
+                // System.out.println("K-Means a convergé après " + (iter + 1) + " itérations.");
                 break;
             }
-            // Sinon, on recommence sur la nouvelle palette
             palette = nouvellePalette;
         }
 
@@ -96,6 +117,6 @@ public class PaletteKmeans implements ExtractionPalette {
 
     @Override
     public String toString() {
-        return "PaletteKmeans";
+        return "K-Means (k=" + k + ")";
     }
 }

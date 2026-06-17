@@ -3,10 +3,7 @@ import Norme.NormeBetterCIELAB;
 import Norme.NormeCouleurs;
 import flou.Flou;
 import flou.FlouMoyenne;
-import palette.BiomeMapper;
-import palette.ExtractionPalette;
-import palette.Palette;
-import palette.PaletteKmeans;
+import palette.*;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -17,130 +14,132 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 public class MainDBSCAN {
-    public static void main(String[] args)  {
-        try {
-            System.out.println("--- Démarrage du pipeline de détection de biomes ---");
 
-            // 1. Chargement de l'image source
-            File inputFile = new File("Images/Planete_1.jpg");
-            if (!inputFile.exists()) {
-                System.out.println("Erreur : Fichier introuvable.");
-                return;
+    // Seuil de similarité pour le filtrage des couleurs de la palette.
+    static final double SEUIL_SIMILARITE = 15.0;
+    // Nombre de couleurs à extraire pour la palette initiale.
+    static final int NB_COULEURS_PALETTE = 15;
+
+    public static void main(String[] args) throws IOException {
+        System.out.println("--- Démarrage du pipeline de détection de biomes et écosystèmes ---");
+
+        // 1. Chargement et pré-traitement de l'image
+        File inputFile = new File("Images/Planete_1.jpg");
+        if (!inputFile.exists()) {
+            System.out.println("Erreur : Fichier introuvable.");
+            return;
+        }
+        BufferedImage originalImage = ImageIO.read(inputFile);
+        int totalPixels = originalImage.getWidth() * originalImage.getHeight();
+
+        // Appliquer un léger flou pour réduire le bruit et homogénéiser les zones
+        Flou flou = new FlouMoyenne(3);
+        BufferedImage blurredImg = flou.appliquerFlou(inputFile);
+        System.out.println("Image pré-traitée avec un filtre de flou.");
+
+        // --- PARTIE 1: DÉTECTION DES BIOMES ---
+
+        // 2. Génération de la palette de couleurs des biomes
+        NormeCouleurs norme = new NormeBetterCIELAB();
+        AlgoExtractionPalette kmeans = new PaletteKmeans(NB_COULEURS_PALETTE);
+        System.out.println("Extraction de " + NB_COULEURS_PALETTE + " couleurs candidates...");
+        Color[] couleursCandidates = kmeans.extrairePalette(blurredImg, NB_COULEURS_PALETTE, norme);
+        Color[] paletteFinale = filtrerCouleursUniques(couleursCandidates, norme, SEUIL_SIMILARITE);
+        Palette paletteBiomes = new Palette(new BiomeMapper(norme).getBiomeMapping(paletteFinale), norme);
+        System.out.println("Palette de biomes finale créée avec " + paletteBiomes.getNbBiomes() + " couleurs.");
+
+        // 3. Création de la carte des biomes et regroupement des pixels par biome
+        System.out.println("Création de la carte des biomes et regroupement des pixels...");
+        BufferedImage biomeMapImage = new BufferedImage(originalImage.getWidth(), originalImage.getHeight(), BufferedImage.TYPE_INT_RGB);
+        Map<Color, List<Point>> pixelsParBiome = new HashMap<>();
+        for (Color biomeColor : paletteBiomes.getBiomeColors().values()) {
+            pixelsParBiome.put(biomeColor, new ArrayList<>());
+        }
+
+        for (int y = 0; y < originalImage.getHeight(); y++) {
+            for (int x = 0; x < originalImage.getWidth(); x++) {
+                Color pixelColor = new Color(blurredImg.getRGB(x, y));
+                String biomeName = paletteBiomes.getBiomePlusProche(pixelColor);
+                Color biomeColor = paletteBiomes.getBiomeColors().get(biomeName);
+
+                biomeMapImage.setRGB(x, y, biomeColor.getRGB());
+                pixelsParBiome.get(biomeColor).add(new Point(x, y));
             }
-            BufferedImage originalImage = ImageIO.read(inputFile);
-
-            // Store original dimensions for final output
-            int originalWidth = originalImage.getWidth();
-            int originalHeight = originalImage.getHeight();
-
-
-            // 3. Application du Flou
-            System.out.println("Application du filtre de flou...");
-
-            Flou flou = new FlouMoyenne(3);
-            BufferedImage blurredImg = flou.appliquerFlou(inputFile);
-
-            // 4. Extraction de la palette de couleurs (K-Means)
-            System.out.println("Extraction de la palette (K-Means)...");
-            NormeCouleurs norme = new NormeBetterCIELAB();
-            ExtractionPalette kmeans = new PaletteKmeans();
-            int nbBiomesAttendus = 20;
-            Color[] paletteDominante = kmeans.extrairePalette(blurredImg, nbBiomesAttendus, norme);
-
-            Color[] paletteFinale = filtrerCouleursUniques(paletteDominante, norme, 15.0);
-
-            BiomeMapper mapper = new BiomeMapper(norme);
-            Map<String, Color> paletteBiome = mapper.getBiomeMapping(paletteFinale);
+        }
+        new File("imagesBiomes").mkdirs();
+        ImageIO.write(biomeMapImage, "PNG", new File("imagesBiomes/rendu_carte_biomes.png"));
+        System.out.println("Carte des biomes sauvegardée dans 'imagesBiomes/rendu_carte_biomes.png'");
 
 
-            // 5. Génération de la carte des biomes
-            System.out.println("Génération de la carte des biomes...");
-            BufferedImage biomeMap = new BufferedImage(originalWidth, originalHeight, BufferedImage.TYPE_INT_RGB);
+        // --- PARTIE 2: DÉTECTION DES ÉCOSYSTÈMES ---
 
-            for (int y = 0; y < originalHeight; y++) {
-                for (int x = 0; x < originalWidth; x++) {
+        System.out.println("\nDétection des écosystèmes pour chaque biome...");
+        BufferedImage ecosystemMapImage = new BufferedImage(originalImage.getWidth(), originalImage.getHeight(), BufferedImage.TYPE_INT_RGB);
+        Graphics2D g2d = ecosystemMapImage.createGraphics();
+        g2d.setColor(Color.BLACK);
+        g2d.fillRect(0, 0, originalImage.getWidth(), originalImage.getHeight());
 
-                    // Récupérer la couleur du pixel original
-                    Color pixelColor = new Color(blurredImg.getRGB(x, y));
+        double epsForEcosystems = 3.0;
+        int minPtsForEcosystems = 20;
+        DBSCAN dbscan = new DBSCAN(epsForEcosystems, minPtsForEcosystems);
+        Random rand = new Random();
 
-                    // Trouver la couleur de biome la plus proche
-                    Color closestColor = null;
-                    double minDistance = Double.MAX_VALUE;
+        for (Map.Entry<Color, List<Point>> entry : pixelsParBiome.entrySet()) {
+            Color biomeColor = entry.getKey();
+            List<Point> biomePixels = entry.getValue();
 
-                    // On calcule la distance entre la couleur du pixel avec celle de chaque couleurs de la palette
-                    for (Map.Entry<String, Color> entry : paletteBiome.entrySet()) {
-                        Color biomeColor = entry.getValue();
+            // Heuristique pour identifier et exclure les océans du clustering spatial
+            boolean isVeryDark = (biomeColor.getRed() + biomeColor.getGreen() + biomeColor.getBlue()) < 60;
+            boolean isVeryLarge = biomePixels.size() > totalPixels * 0.30;
 
-                        double distance = norme.distanceCouleur(pixelColor, biomeColor);
-
-                        if (distance < minDistance) {
-                            minDistance = distance;
-                            closestColor = biomeColor;
-                        }
-                    }
-
-                    // Colorier le pixel
-                    biomeMap.setRGB(x, y, closestColor.getRGB());
+            if (isVeryDark && isVeryLarge) {
+                System.out.println("Exclusion du biome de type océan (trop grand) : " + biomePixels.size() + " pixels.");
+                // On dessine l'océan avec sa couleur de base, sans chercher les écosystèmes
+                for (Point p : biomePixels) {
+                    ecosystemMapImage.setRGB(p.x, p.y, biomeColor.getRGB());
                 }
+                continue; // On passe au biome suivant
             }
 
-            // 6. Sauvegarde
-            //File biomeMapFile = new File("carte_biomes.png");
-            //ImageIO.write(biomeMap, "PNG", biomeMapFile);
-
-            // 6. Sauvegarde de la carte complète
-            File biomeMapFile = new File("carte_biomes.png");
-            ImageIO.write(biomeMap, "PNG", biomeMapFile);
-
-            // ==========================================
-            // 7. Visualisation de Biome Individuel (Bonus)
-            // ==========================================
-            System.out.println("Génération du calque pour un biome spécifique...");
-
-            // On vérifie qu'on a bien trouvé des biomes
-            if (!paletteBiome.isEmpty()) {
-                // Pour l'exemple, on prend le tout premier biome de ta HashMap
-                Map.Entry<String, Color> biomeCible = paletteBiome.entrySet().iterator().next();
-                String nomBiome = biomeCible.getKey();
-                Color couleurBiome = biomeCible.getValue();
-
-                System.out.println("Isolement en cours pour le biome : " + nomBiome);
-
-                // On nettoie le nom du fichier au cas où il y aurait des espaces
-                String nomFichierPropre = nomBiome.replaceAll("\\s+", "_");
-                String fichierSortie = "masque_biome_" + nomFichierPropre + ".png";
-
-                // On appelle notre nouvelle méthode
-                genererMasqueBiome(originalImage, biomeMap, couleurBiome, fichierSortie);
-                System.out.println("Calque généré avec succès : " + fichierSortie);
+            if (biomePixels.size() < minPtsForEcosystems) {
+                continue;
             }
 
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
+            System.out.println("Traitement du biome (couleur RGB " + biomeColor.getRed() + "," + biomeColor.getGreen() + "," + biomeColor.getBlue() + ") contenant " + biomePixels.size() + " pixels.");
 
-    private static Map<Integer, Color> getClusterBiomeColors(int[] labels, Color[] pixelColors) {
-        Map<Integer, Map<Color, Integer>> clusterColorCounts = new HashMap<>();
-        for (int i = 0; i < labels.length; i++) {
-            int clusterId = labels[i];
-            if (clusterId != 0) { // Exclure le bruit
-                Color pixelBiomeColor = pixelColors[i];
-                clusterColorCounts.computeIfAbsent(clusterId, k -> new HashMap<>())
-                                  .merge(pixelBiomeColor, 1, Integer::sum);
+            double[][] points = new double[biomePixels.size()][2];
+            for (int i = 0; i < biomePixels.size(); i++) {
+                points[i][0] = biomePixels.get(i).getX();
+                points[i][1] = biomePixels.get(i).getY();
+            }
+
+            int[] labels = dbscan.cluster(points);
+
+            Map<Integer, Color> ecosystemColors = new HashMap<>();
+            int ecosystemCount = 0;
+            for (int i = 0; i < labels.length; i++) {
+                int clusterId = labels[i];
+                if (clusterId == 0) continue;
+
+                if (!ecosystemColors.containsKey(clusterId)) {
+                    ecosystemColors.put(clusterId, new Color(rand.nextInt(256), rand.nextInt(256), rand.nextInt(256)));
+                    ecosystemCount++;
+                }
+
+                Point p = biomePixels.get(i);
+                ecosystemMapImage.setRGB(p.x, p.y, ecosystemColors.get(clusterId).getRGB());
+            }
+            if (ecosystemCount > 0) {
+                System.out.println(" -> " + ecosystemCount + " écosystèmes détectés.");
             }
         }
-
-        Map<Integer, Color> clusterBiomeColors = new HashMap<>();
-        for (Map.Entry<Integer, Map<Color, Integer>> entry : clusterColorCounts.entrySet()) {
-            int clusterId = entry.getKey();
-            entry.getValue().entrySet().stream()
-                 .max(Map.Entry.comparingByValue())
-                 .ifPresent(dominantEntry -> clusterBiomeColors.put(clusterId, dominantEntry.getKey()));
-        }
-        return clusterBiomeColors;
+        g2d.dispose();
+        ImageIO.write(ecosystemMapImage, "PNG", new File("imagesBiomes/rendu_ecosystemes.png"));
+        System.out.println("\nCarte des écosystèmes sauvegardée dans 'imagesBiomes/rendu_ecosystemes.png'");
+        System.out.println("--- Pipeline terminé ---");
     }
 
     private static Color[] filtrerCouleursUniques(Color[] couleursEntrantes, NormeCouleurs norme, double seuil) {
@@ -153,39 +152,5 @@ public class MainDBSCAN {
             }
         }
         return couleursUniques.toArray(new Color[0]);
-    }
-
-    /**
-     * Génère une image isolant un biome spécifique.
-     * Les pixels n'appartenant pas au biome deviennent transparents.
-     */
-    private static void genererMasqueBiome(BufferedImage imageOriginale, BufferedImage carteBiomes, Color couleurBiomeCible, String nomFichierSortie) throws IOException {
-        int width = imageOriginale.getWidth();
-        int height = imageOriginale.getHeight();
-
-        // On utilise ARGB pour gérer le canal Alpha (la transparence)
-        BufferedImage masqueImg = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
-
-        // Couleur transparente (Noir avec 0 d'opacité)
-        int couleurTransparente = new Color(0, 0, 0, 0).getRGB();
-        int cibleRGB = couleurBiomeCible.getRGB();
-
-        for (int y = 0; y < height; y++) {
-            for (int x = 0; x < width; x++) {
-                // On regarde à quel biome appartient ce pixel sur la carte générée
-                int pixelBiomeCourant = carteBiomes.getRGB(x, y);
-
-                if (pixelBiomeCourant == cibleRGB) {
-                    // Si c'est le bon biome, on affiche le pixel de l'image source (ou floutée)
-                    masqueImg.setRGB(x, y, imageOriginale.getRGB(x, y));
-                } else {
-                    // Sinon, on rend le pixel invisible
-                    masqueImg.setRGB(x, y, couleurTransparente);
-                }
-            }
-        }
-
-        // Sauvegarde de l'image isolée
-        ImageIO.write(masqueImg, "PNG", new File(nomFichierSortie));
     }
 }

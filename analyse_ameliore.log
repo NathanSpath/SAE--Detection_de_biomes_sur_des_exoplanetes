@@ -1,0 +1,26 @@
+Jun 18, 2026 1:36:07 AM MainAmeliore main
+INFO: --- Démarrage du pipeline AMÉLIORÉ pour la QUALITÉ ---
+Jun 18, 2026 1:36:08 AM MainAmeliore runPipeline
+INFO: Étape 1: Image pré-traitée et sauvegardée.
+Jun 18, 2026 1:36:15 AM MainAmeliore runPipeline
+INFO: Étape 2: Palette de 6 biomes créée et sauvegardée.
+Jun 18, 2026 1:36:16 AM MainAmeliore runPipeline
+INFO: Étape 3: Cartographie des biomes terminée.
+Jun 18, 2026 1:36:16 AM MainAmeliore runPipeline
+INFO: 
+Étape 4: Génération des images...
+Jun 18, 2026 1:36:16 AM MainAmeliore visualizeEcosystemsForBiome
+INFO:    -> [NORMAL] 'Mer_Peu_Profonde' (59557 pixels)...
+Jun 18, 2026 1:36:16 AM MainAmeliore visualizeEcosystemsForBiome
+INFO:    -> [NORMAL] 'Terre_Rocheuse' (39227 pixels)...
+Jun 18, 2026 1:36:16 AM MainAmeliore visualizeEcosystemsForBiome
+INFO:    -> [NORMAL] 'Montagne_Rocheuse' (26774 pixels)...
+Jun 18, 2026 1:36:16 AM MainAmeliore visualizeEcosystemsForBiome
+INFO:    -> [TRES RAPIDE] 'Ocean_Profond' (829965 pixels)...
+Jun 18, 2026 1:36:16 AM MainAmeliore visualizeEcosystemsForBiome
+INFO:    -> [RAPIDE] 'Terre_Volcanique' (190968 pixels)...
+Jun 18, 2026 1:36:16 AM MainAmeliore visualizeEcosystemsForBiome
+INFO:    -> [RAPIDE] 'Savane_Seche' (103173 pixels)...
+Jun 18, 2026 1:38:29 AM MainAmeliore main
+INFO: 
+--- Pipeline AMÉLIORÉ terminé en 142.121 secondes. ---

@@ -22,18 +22,28 @@ import java.util.concurrent.*;
 
 public class MainNouveau {
 
-    // --- PARAMÈTRES ---
-    static final int NB_THREADS = Runtime.getRuntime().availableProcessors(); //utilise les cœurs disponibles
-    static final double SEUIL_SIMILARITE = 15.0;
-    static final int NB_COULEURS_PALETTE = 20;
+    // --- PARAMÈTRES OPTIMISÉS ET ÉQUILIBRÉS ---
+    static final int NB_THREADS = Runtime.getRuntime().availableProcessors();
     static final String IMAGE_INPUT_PATH = "Images/Planete_1.jpg";
     static final String OUTPUT_DIR = "rendus_individuels";
 
+    // Paramètres de flou
+    static final int FLOU_RAYON = 3;
+
+    // Paramètres de la palette (K-Means)
+    static final int KMEANS_K = 20; // Un k plus élevé crée des biomes plus petits, accélérant DBSCAN.
+    static final double SEUIL_SIMILARITE = 15.0;
+
+    // Paramètres des écosystèmes (DBSCAN)
+    static final double DBSCAN_EPS = 3.0;      // eps=3 est bien plus rapide que 5.
+    static final int DBSCAN_MIN_PTS = 10;     // minPts=10 est un bon compromis pour trouver des clusters sans être trop lent.
+
+
     public static void main(String[] args) throws IOException, InterruptedException, ExecutionException {
-        System.out.println("--- Démarrage du pipeline de visualisation parallèle ---");
+        System.out.println("--- Démarrage du pipeline avec paramètres optimisés ---");
         System.out.println("Utilisation de " + NB_THREADS + " threads.");
 
-        // --- 1. ÉTAPES GLOBALES  ---
+        // --- 1. ÉTAPES GLOBALES (THREAD PRINCIPAL) ---
         File inputFile = new File(IMAGE_INPUT_PATH);
         if (!inputFile.exists()) {
             System.out.println("Erreur : Fichier d'entrée introuvable.");
@@ -42,20 +52,19 @@ public class MainNouveau {
         BufferedImage originalImage = ImageIO.read(inputFile);
         String imageName = inputFile.getName().split("\\.")[0];
 
-        // Création des dossiers de sortie
         new File(OUTPUT_DIR).mkdirs();
         new File(OUTPUT_DIR + "/" + imageName + "_biomes").mkdirs();
         new File(OUTPUT_DIR + "/" + imageName + "_ecosystemes_par_biome").mkdirs();
 
-        Flou flou = new FlouMoyenne(3);
+        Flou flou = new FlouMoyenne(FLOU_RAYON);
         BufferedImage blurredImg = flou.appliquerFlou(inputFile);
-        System.out.println("Image pré-traitée avec un filtre de flou.");
+        System.out.println("Image pré-traitée avec un filtre de flou (rayon=" + FLOU_RAYON + ").");
 
         NormeCouleurs norme = new NormeBetterCIELAB();
-        AlgoExtractionPalette kmeans = new PaletteKmeans(NB_COULEURS_PALETTE);
-        Color[] paletteCouleurs = kmeans.extrairePalette(blurredImg, NB_COULEURS_PALETTE, norme);
+        AlgoExtractionPalette kmeans = new PaletteKmeans(KMEANS_K);
+        Color[] paletteCouleurs = kmeans.extrairePalette(blurredImg, KMEANS_K, norme);
         Palette paletteBiomes = new Palette(new BiomeMapper(norme).getBiomeMapping(paletteCouleurs), norme);
-        System.out.println("Palette de biomes globale créée.");
+        System.out.println("Palette de biomes globale créée (k=" + KMEANS_K + ").");
 
         // --- 2. PARALLÉLISATION DE LA CARTOGRAPHIE DES BIOMES ---
         System.out.println("Cartographie des biomes en parallèle...");
@@ -73,9 +82,7 @@ public class MainNouveau {
             List<Point> biomePixels = entry.getValue();
 
             Callable<Void> task = () -> {
-                // Tâche A: Visualiser le biome sur fond clair
                 visualizeBiome(imageName, biomeName, biomePixels, lightBackground, originalImage);
-                // Tâche B: Visualiser les écosystèmes de ce biome avec des couleurs flashy
                 visualizeEcosystemsForBiome(imageName, biomeName, biomePixels, lightBackground);
                 return null;
             };
@@ -140,10 +147,13 @@ public class MainNouveau {
     }
 
     private static void visualizeEcosystemsForBiome(String imageName, String biomeName, List<Point> biomePixels, BufferedImage lightBackground) throws IOException {
-        if (biomePixels.size() < 20) return;
+        if (biomePixels.size() < DBSCAN_MIN_PTS) {
+            System.out.println(" -> Biome '" + biomeName + "' ignoré pour les écosystèmes (pas assez de pixels).");
+            return;
+        }
 
         System.out.println("Traitement des écosystèmes pour le biome : " + biomeName);
-        DBSCAN dbscan = new DBSCAN(3, 50);
+        DBSCAN dbscan = new DBSCAN(DBSCAN_EPS, DBSCAN_MIN_PTS);
         double[][] points = new double[biomePixels.size()][2];
         for (int i = 0; i < biomePixels.size(); i++) {
             points[i][0] = biomePixels.get(i).getX();
@@ -157,15 +167,18 @@ public class MainNouveau {
             if (clusterId == 0) continue;
             pixelsParEcosysteme.computeIfAbsent(clusterId, k -> new ArrayList<>()).add(biomePixels.get(i));
         }
+        
+        if (pixelsParEcosysteme.isEmpty()) {
+            System.out.println(" -> Aucun écosystème trouvé pour le biome '" + biomeName + "' avec les paramètres actuels.");
+            return;
+        }
 
-        // Création de l'image unique pour tous les écosystèmes de ce biome
         BufferedImage ecosystemImage = new BufferedImage(lightBackground.getWidth(), lightBackground.getHeight(), BufferedImage.TYPE_INT_RGB);
         Graphics2D g2d = ecosystemImage.createGraphics();
         g2d.drawImage(lightBackground, 0, 0, null);
 
         Random rand = new Random();
         for (List<Point> ecosystemPixels : pixelsParEcosysteme.values()) {
-            // Couleur aléatoire et flashy pour chaque écosystème
             Color flashyColor = new Color(rand.nextInt(200) + 55, rand.nextInt(200) + 55, rand.nextInt(200) + 55);
             for (Point p : ecosystemPixels) {
                 ecosystemImage.setRGB(p.x, p.y, flashyColor.getRGB());

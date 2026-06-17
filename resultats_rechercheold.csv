@@ -1,0 +1,145 @@
+Image;AlgoPalette;AlgoEcosysteme;FlouRayon;KMeans_K;DBSCAN_Eps;DBSCAN_MinPts;HAC_K;TempsTotal_ms
+Planete_4.jpg;K-Means (k=10);DBSCAN (eps=3.0, minPts=20);3;10;3.0;20;N/A;238253
+Planete_4.jpg;K-Means (k=10);DBSCAN (eps=3.0, minPts=50);3;10;3.0;50;N/A;98663
+Planete_4.jpg;K-Means (k=10);DBSCAN (eps=5.0, minPts=20);3;10;5.0;20;N/A;484002
+Planete_4.jpg;K-Means (k=10);DBSCAN (eps=5.0, minPts=50);3;10;5.0;50;N/A;279526
+Planete_4.jpg;K-Means (k=10);HAC (k=10);3;10;N/A;N/A;10;4996
+Planete_4.jpg;K-Means (k=10);HAC (k=20);3;10;N/A;N/A;20;5291
+Planete_4.jpg;K-Means (k=15);DBSCAN (eps=3.0, minPts=20);3;15;3.0;20;N/A;115688
+Planete_4.jpg;K-Means (k=15);DBSCAN (eps=3.0, minPts=50);3;15;3.0;50;N/A;55245
+Planete_4.jpg;K-Means (k=15);DBSCAN (eps=5.0, minPts=20);3;15;5.0;20;N/A;239927
+Planete_4.jpg;K-Means (k=15);DBSCAN (eps=5.0, minPts=50);3;15;5.0;50;N/A;186398
+Planete_4.jpg;K-Means (k=15);HAC (k=10);3;15;N/A;N/A;10;5841
+Planete_4.jpg;K-Means (k=15);HAC (k=20);3;15;N/A;N/A;20;5657
+Planete_4.jpg;K-Means (k=20);DBSCAN (eps=3.0, minPts=20);3;20;3.0;20;N/A;127345
+Planete_4.jpg;K-Means (k=20);DBSCAN (eps=3.0, minPts=50);3;20;3.0;50;N/A;37646
+Planete_4.jpg;K-Means (k=20);DBSCAN (eps=5.0, minPts=20);3;20;5.0;20;N/A;150074
+Planete_4.jpg;K-Means (k=20);DBSCAN (eps=5.0, minPts=50);3;20;5.0;50;N/A;121791
+Planete_4.jpg;K-Means (k=20);HAC (k=10);3;20;N/A;N/A;10;4084
+Planete_4.jpg;K-Means (k=20);HAC (k=20);3;20;N/A;N/A;20;4886
+Planete_4.jpg;K-Means (k=10);DBSCAN (eps=3.0, minPts=20);5;10;3.0;20;N/A;101493
+Planete_4.jpg;K-Means (k=10);DBSCAN (eps=3.0, minPts=50);5;10;3.0;50;N/A;76673
+Planete_4.jpg;K-Means (k=10);DBSCAN (eps=5.0, minPts=20);5;10;5.0;20;N/A;403669
+Planete_4.jpg;K-Means (k=10);DBSCAN (eps=5.0, minPts=50);5;10;5.0;50;N/A;494210
+Planete_4.jpg;K-Means (k=10);HAC (k=10);5;10;N/A;N/A;10;5398
+Planete_4.jpg;K-Means (k=10);HAC (k=20);5;10;N/A;N/A;20;5880
+Planete_4.jpg;K-Means (k=15);DBSCAN (eps=3.0, minPts=20);5;15;3.0;20;N/A;122191
+Planete_4.jpg;K-Means (k=15);DBSCAN (eps=3.0, minPts=50);5;15;3.0;50;N/A;80311
+Planete_4.jpg;K-Means (k=15);DBSCAN (eps=5.0, minPts=20);5;15;5.0;20;N/A;171784
+Planete_4.jpg;K-Means (k=15);DBSCAN (eps=5.0, minPts=50);5;15;5.0;50;N/A;170662
+Planete_4.jpg;K-Means (k=15);HAC (k=10);5;15;N/A;N/A;10;5208
+Planete_4.jpg;K-Means (k=15);HAC (k=20);5;15;N/A;N/A;20;5396
+Planete_4.jpg;K-Means (k=20);DBSCAN (eps=3.0, minPts=20);5;20;3.0;20;N/A;99156
+Planete_4.jpg;K-Means (k=20);DBSCAN (eps=3.0, minPts=50);5;20;3.0;50;N/A;58360
+Planete_4.jpg;K-Means (k=20);DBSCAN (eps=5.0, minPts=20);5;20;5.0;20;N/A;134211
+Planete_4.jpg;K-Means (k=20);DBSCAN (eps=5.0, minPts=50);5;20;5.0;50;N/A;120692
+Planete_4.jpg;K-Means (k=20);HAC (k=10);5;20;N/A;N/A;10;6152
+Planete_4.jpg;K-Means (k=20);HAC (k=20);5;20;N/A;N/A;20;7830
+Planete_2.jpg;K-Means (k=10);DBSCAN (eps=3.0, minPts=20);3;10;3.0;20;N/A;1347623
+Planete_2.jpg;K-Means (k=10);DBSCAN (eps=3.0, minPts=50);3;10;3.0;50;N/A;23780
+Planete_2.jpg;K-Means (k=10);DBSCAN (eps=5.0, minPts=20);3;10;5.0;20;N/A;23414
+Planete_2.jpg;K-Means (k=10);DBSCAN (eps=5.0, minPts=50);3;10;5.0;50;N/A;24024
+Planete_2.jpg;K-Means (k=10);HAC (k=10);3;10;N/A;N/A;10;24149
+Planete_2.jpg;K-Means (k=10);HAC (k=20);3;10;N/A;N/A;20;26693
+Planete_2.jpg;K-Means (k=15);DBSCAN (eps=3.0, minPts=20);3;15;3.0;20;N/A;1313045
+Planete_2.jpg;K-Means (k=15);DBSCAN (eps=3.0, minPts=50);3;15;3.0;50;N/A;1123206
+Planete_2.jpg;K-Means (k=15);DBSCAN (eps=5.0, minPts=20);3;15;5.0;20;N/A;1457115
+Planete_2.jpg;K-Means (k=15);DBSCAN (eps=5.0, minPts=50);3;15;5.0;50;N/A;784010
+Planete_2.jpg;K-Means (k=15);HAC (k=10);3;15;N/A;N/A;10;29073
+Planete_2.jpg;K-Means (k=15);HAC (k=20);3;15;N/A;N/A;20;26771
+Planete_2.jpg;K-Means (k=20);DBSCAN (eps=3.0, minPts=20);3;20;3.0;20;N/A;1309370
+Planete_2.jpg;K-Means (k=20);DBSCAN (eps=3.0, minPts=50);3;20;3.0;50;N/A;603613
+Planete_2.jpg;K-Means (k=20);DBSCAN (eps=5.0, minPts=20);3;20;5.0;20;N/A;873154
+Planete_2.jpg;K-Means (k=20);DBSCAN (eps=5.0, minPts=50);3;20;5.0;50;N/A;1210819
+Planete_2.jpg;K-Means (k=20);HAC (k=10);3;20;N/A;N/A;10;24956
+Planete_2.jpg;K-Means (k=20);HAC (k=20);3;20;N/A;N/A;20;35170
+Planete_2.jpg;K-Means (k=10);DBSCAN (eps=3.0, minPts=20);5;10;3.0;20;N/A;446248
+Planete_2.jpg;K-Means (k=10);DBSCAN (eps=3.0, minPts=50);5;10;3.0;50;N/A;41172
+Planete_2.jpg;K-Means (k=10);DBSCAN (eps=5.0, minPts=20);5;10;5.0;20;N/A;40397
+Planete_2.jpg;K-Means (k=10);DBSCAN (eps=5.0, minPts=50);5;10;5.0;50;N/A;37962
+Planete_2.jpg;K-Means (k=10);HAC (k=10);5;10;N/A;N/A;10;41156
+Planete_2.jpg;K-Means (k=10);HAC (k=20);5;10;N/A;N/A;20;38686
+Planete_2.jpg;K-Means (k=15);DBSCAN (eps=3.0, minPts=20);5;15;3.0;20;N/A;1072913
+Planete_2.jpg;K-Means (k=15);DBSCAN (eps=3.0, minPts=50);5;15;3.0;50;N/A;478654
+Planete_2.jpg;K-Means (k=15);DBSCAN (eps=5.0, minPts=20);5;15;5.0;20;N/A;1781598
+Planete_2.jpg;K-Means (k=15);DBSCAN (eps=5.0, minPts=50);5;15;5.0;50;N/A;1471280
+Planete_2.jpg;K-Means (k=15);HAC (k=10);5;15;N/A;N/A;10;33376
+Planete_2.jpg;K-Means (k=15);HAC (k=20);5;15;N/A;N/A;20;33953
+Planete_2.jpg;K-Means (k=20);DBSCAN (eps=3.0, minPts=20);5;20;3.0;20;N/A;1242931
+Planete_2.jpg;K-Means (k=20);DBSCAN (eps=3.0, minPts=50);5;20;3.0;50;N/A;961499
+Planete_2.jpg;K-Means (k=20);DBSCAN (eps=5.0, minPts=20);5;20;5.0;20;N/A;1733147
+Planete_2.jpg;K-Means (k=20);DBSCAN (eps=5.0, minPts=50);5;20;5.0;50;N/A;1341302
+Planete_2.jpg;K-Means (k=20);HAC (k=10);5;20;N/A;N/A;10;35842
+Planete_2.jpg;K-Means (k=20);HAC (k=20);5;20;N/A;N/A;20;34898
+Planete_1.jpg;K-Means (k=10);DBSCAN (eps=3.0, minPts=20);3;10;3.0;20;N/A;6209638
+Planete_1.jpg;K-Means (k=10);DBSCAN (eps=3.0, minPts=50);3;10;3.0;50;N/A;819090
+Planete_1.jpg;K-Means (k=10);DBSCAN (eps=5.0, minPts=20);3;10;5.0;20;N/A;14073604
+Planete_1.jpg;K-Means (k=10);DBSCAN (eps=5.0, minPts=50);3;10;5.0;50;N/A;11756503
+Planete_1.jpg;K-Means (k=10);HAC (k=10);3;10;N/A;N/A;10;8371
+Planete_1.jpg;K-Means (k=10);HAC (k=20);3;10;N/A;N/A;20;8784
+Planete_1.jpg;K-Means (k=15);DBSCAN (eps=3.0, minPts=20);3;15;3.0;20;N/A;1039103
+Planete_1.jpg;K-Means (k=15);DBSCAN (eps=3.0, minPts=50);3;15;3.0;50;N/A;910446
+Planete_1.jpg;K-Means (k=15);DBSCAN (eps=5.0, minPts=20);3;15;5.0;20;N/A;1856361
+Planete_1.jpg;K-Means (k=15);DBSCAN (eps=5.0, minPts=50);3;15;5.0;50;N/A;3095011
+Planete_1.jpg;K-Means (k=15);HAC (k=10);3;15;N/A;N/A;10;10355
+Planete_1.jpg;K-Means (k=15);HAC (k=20);3;15;N/A;N/A;20;9318
+Planete_1.jpg;K-Means (k=20);DBSCAN (eps=3.0, minPts=20);3;20;3.0;20;N/A;705838
+Planete_1.jpg;K-Means (k=20);DBSCAN (eps=3.0, minPts=50);3;20;3.0;50;N/A;487874
+Planete_1.jpg;K-Means (k=20);DBSCAN (eps=5.0, minPts=20);3;20;5.0;20;N/A;2930125
+Planete_1.jpg;K-Means (k=20);DBSCAN (eps=5.0, minPts=50);3;20;5.0;50;N/A;900489
+Planete_1.jpg;K-Means (k=20);HAC (k=10);3;20;N/A;N/A;10;9257
+Planete_1.jpg;K-Means (k=20);HAC (k=20);3;20;N/A;N/A;20;9714
+Planete_1.jpg;K-Means (k=10);DBSCAN (eps=3.0, minPts=20);5;10;3.0;20;N/A;5821291
+Planete_1.jpg;K-Means (k=10);DBSCAN (eps=3.0, minPts=50);5;10;3.0;50;N/A;1973975
+Planete_1.jpg;K-Means (k=10);DBSCAN (eps=5.0, minPts=20);5;10;5.0;20;N/A;17838854
+Planete_1.jpg;K-Means (k=10);DBSCAN (eps=5.0, minPts=50);5;10;5.0;50;N/A;6829810
+Planete_1.jpg;K-Means (k=10);HAC (k=10);5;10;N/A;N/A;10;16060
+Planete_1.jpg;K-Means (k=10);HAC (k=20);5;10;N/A;N/A;20;17245
+Planete_1.jpg;K-Means (k=15);DBSCAN (eps=3.0, minPts=20);5;15;3.0;20;N/A;6585708
+Planete_1.jpg;K-Means (k=15);DBSCAN (eps=3.0, minPts=50);5;15;3.0;50;N/A;340824
+Planete_1.jpg;K-Means (k=15);DBSCAN (eps=5.0, minPts=20);5;15;5.0;20;N/A;1857448
+Planete_1.jpg;K-Means (k=15);DBSCAN (eps=5.0, minPts=50);5;15;5.0;50;N/A;10982381
+Planete_1.jpg;K-Means (k=15);HAC (k=10);5;15;N/A;N/A;10;15125
+Planete_1.jpg;K-Means (k=15);HAC (k=20);5;15;N/A;N/A;20;17669
+Planete_1.jpg;K-Means (k=20);DBSCAN (eps=3.0, minPts=20);5;20;3.0;20;N/A;941783
+Planete_1.jpg;K-Means (k=20);DBSCAN (eps=3.0, minPts=50);5;20;3.0;50;N/A;490514
+Planete_1.jpg;K-Means (k=20);DBSCAN (eps=5.0, minPts=20);5;20;5.0;20;N/A;6948743
+Planete_1.jpg;K-Means (k=20);DBSCAN (eps=5.0, minPts=50);5;20;5.0;50;N/A;12009462
+Planete_1.jpg;K-Means (k=20);HAC (k=10);5;20;N/A;N/A;10;16097
+Planete_1.jpg;K-Means (k=20);HAC (k=20);5;20;N/A;N/A;20;14729
+Planete_3.jpg;K-Means (k=10);DBSCAN (eps=3.0, minPts=20);3;10;3.0;20;N/A;8826136
+Planete_3.jpg;K-Means (k=10);DBSCAN (eps=3.0, minPts=50);3;10;3.0;50;N/A;1545102
+Planete_3.jpg;K-Means (k=10);DBSCAN (eps=5.0, minPts=20);3;10;5.0;20;N/A;13125908
+Planete_3.jpg;K-Means (k=10);DBSCAN (eps=5.0, minPts=50);3;10;5.0;50;N/A;10195388
+Planete_3.jpg;K-Means (k=10);HAC (k=10);3;10;N/A;N/A;10;14250
+Planete_3.jpg;K-Means (k=10);HAC (k=20);3;10;N/A;N/A;20;11362
+Planete_3.jpg;K-Means (k=15);DBSCAN (eps=3.0, minPts=20);3;15;3.0;20;N/A;4219527
+Planete_3.jpg;K-Means (k=15);DBSCAN (eps=3.0, minPts=50);3;15;3.0;50;N/A;2560422
+Planete_3.jpg;K-Means (k=15);DBSCAN (eps=5.0, minPts=20);3;15;5.0;20;N/A;9074232
+Planete_3.jpg;K-Means (k=15);DBSCAN (eps=5.0, minPts=50);3;15;5.0;50;N/A;4583589
+Planete_3.jpg;K-Means (k=15);HAC (k=10);3;15;N/A;N/A;10;13080
+Planete_3.jpg;K-Means (k=15);HAC (k=20);3;15;N/A;N/A;20;12119
+Planete_3.jpg;K-Means (k=20);DBSCAN (eps=3.0, minPts=20);3;20;3.0;20;N/A;1478897
+Planete_3.jpg;K-Means (k=20);DBSCAN (eps=3.0, minPts=50);3;20;3.0;50;N/A;935361
+Planete_3.jpg;K-Means (k=20);DBSCAN (eps=5.0, minPts=20);3;20;5.0;20;N/A;902706
+Planete_3.jpg;K-Means (k=20);DBSCAN (eps=5.0, minPts=50);3;20;5.0;50;N/A;1275308
+Planete_3.jpg;K-Means (k=20);HAC (k=10);3;20;N/A;N/A;10;12896
+Planete_3.jpg;K-Means (k=20);HAC (k=20);3;20;N/A;N/A;20;12570
+Planete_3.jpg;K-Means (k=10);DBSCAN (eps=3.0, minPts=20);5;10;3.0;20;N/A;4794860
+Planete_3.jpg;K-Means (k=10);DBSCAN (eps=3.0, minPts=50);5;10;3.0;50;N/A;3361156
+Planete_3.jpg;K-Means (k=10);DBSCAN (eps=5.0, minPts=20);5;10;5.0;20;N/A;7713776
+Planete_3.jpg;K-Means (k=10);DBSCAN (eps=5.0, minPts=50);5;10;5.0;50;N/A;5207901
+Planete_3.jpg;K-Means (k=10);HAC (k=10);5;10;N/A;N/A;10;18496
+Planete_3.jpg;K-Means (k=10);HAC (k=20);5;10;N/A;N/A;20;18101
+Planete_3.jpg;K-Means (k=15);DBSCAN (eps=3.0, minPts=20);5;15;3.0;20;N/A;2550385
+Planete_3.jpg;K-Means (k=15);DBSCAN (eps=3.0, minPts=50);5;15;3.0;50;N/A;1894713
+Planete_3.jpg;K-Means (k=15);DBSCAN (eps=5.0, minPts=20);5;15;5.0;20;N/A;3883400
+Planete_3.jpg;K-Means (k=15);DBSCAN (eps=5.0, minPts=50);5;15;5.0;50;N/A;2803820
+Planete_3.jpg;K-Means (k=15);HAC (k=10);5;15;N/A;N/A;10;18976
+Planete_3.jpg;K-Means (k=15);HAC (k=20);5;15;N/A;N/A;20;18830
+Planete_3.jpg;K-Means (k=20);DBSCAN (eps=3.0, minPts=20);5;20;3.0;20;N/A;2386164
+Planete_3.jpg;K-Means (k=20);DBSCAN (eps=3.0, minPts=50);5;20;3.0;50;N/A;887522
+Planete_3.jpg;K-Means (k=20);DBSCAN (eps=5.0, minPts=20);5;20;5.0;20;N/A;4325220
+Planete_3.jpg;K-Means (k=20);DBSCAN (eps=5.0, minPts=50);5;20;5.0;50;N/A;2152451
+Planete_3.jpg;K-Means (k=20);HAC (k=10);5;20;N/A;N/A;10;20558
+Planete_3.jpg;K-Means (k=20);HAC (k=20);5;20;N/A;N/A;20;20495

@@ -2,10 +2,7 @@ import Norme.NormeBetterCIELAB;
 import Norme.NormeCouleurs;
 import flou.Flou;
 import flou.FlouMoyenne;
-import palette.BiomeMapper;
-import palette.ExtractionPalette;
-import palette.Palette;
-import palette.PaletteKmeans;
+import palette.*;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -29,9 +26,8 @@ public class Main {
             return;
         }
         File img = new File(args[0]);
-        // Le constructeur de FlouMoyenne n'existe pas, j'utilise le constructeur par défaut.
         Flou methodeFlou = new FlouMoyenne(5);
-        ExtractionPalette extraction = new PaletteKmeans();
+        AlgoExtractionPalette extraction = new PaletteKmeans(NB_COULEURS_CANDIDATES);
         NormeCouleurs norme = new NormeBetterCIELAB();
         BiomeMapper mapper = new BiomeMapper(norme);
 

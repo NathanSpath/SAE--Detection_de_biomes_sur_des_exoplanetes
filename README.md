@@ -32,7 +32,8 @@ Ce projet a pour but de développer une application capable d'analyser des image
 - **Mathieu CABOT**:
   - Coordination générale, aide sur tous les fronts.
   - **Rédaction du rapport** et de la documentation.
-  - Assistance à Julien et Nathan.
+  - Assistance à Julien sur HAC.
+  - Analyse des données des résultats pour trouver les meilleurs paramètres.
 
 ## Présentation de l'Application
 
